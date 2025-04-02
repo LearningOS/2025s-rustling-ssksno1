@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -23,7 +22,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![],
             comparator,
         }
     }
@@ -37,7 +36,14 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        let mut i = self.items.len() - 1;
+        while i > 0 && (self.comparator)(&self.items[i], &self.items[self.parent_idx(i)]) {
+            let parent = self.parent_idx(i);
+            self.items.swap(i, parent);
+            i = parent;
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -84,8 +90,31 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        let len = self.items.len();
+        self.items.swap(0, len - 1);
+        let ret = self.items.pop();
+        let mut i = 0;
+        while i < self.items.len() {
+            let left = self.left_child_idx(i);
+            let right = self.right_child_idx(i);
+            let mut temp = i;
+            if left < self.items.len() && (self.comparator)(&self.items[left], &self.items[temp]){
+                temp = left;
+            }
+            if right < self.items.len() && (self.comparator)(&self.items[right], &self.items[temp]){
+                temp = right;
+            }
+            if temp != i {
+                self.items.swap(i, temp);
+                i = temp;
+            } else {
+                break;
+            }
+        }
+        ret
     }
 }
 
